@@ -1,0 +1,105 @@
+FROM ubuntu:18.04
+
+MAINTAINER Yaheng Wang(jjbioinfo@163.com)
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# 国内跟换阿里镜像源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.aliyun.com\/ubuntu\//g' /etc/apt/sources.list \
+&& apt-get update
+
+RUN apt-get install -y tar \
+		unzip \
+		wget \
+		libcurl-openssl1.0-dev \
+		gcc \
+		cpanminus \
+		python3 \
+		make \
+		zlib1g-dev 
+		
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+RUN cpan 'HTTP::Tiny' \
+&& cpan 'GD::Graph'
+
+
+# 安装bwa
+ENV BWA_VERSION=0.7.17
+
+RUN wget -c https://sourceforge.net/projects/bio-bwa/files/bwa-${BWA_VERSION}.tar.bz2 -O /tmp/bwa-${BWA_VERSION}.tar.bz2
+
+RUN cd /tmp \
+&& tar -jxvf /tmp/bwa-${BWA_VERSION}.tar.bz2 \
+&& cd /tmp/bwa-${BWA_VERSION} \
+&& make \
+&& mv bwa /usr/local/bin
+
+# 安装samtools
+ENV SAMTOOLS_VERSION=1.10
+
+RUN wget -c https://sourceforge.net/projects/samtools/files/samtools/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2 -O /tmp/samtools-${SAMTOOLS_VERSION}.tar.bz2
+
+RUN cd /tmp \
+&& tar -jxvf /tmp/samtools-${SAMTOOLS_VERSION}.tar.bz2 \
+&& cd 
+
+
+# 安装bowtie
+ENV BOWTIE_VERSION=1.2.3
+
+RUN wget -c https://sourceforge.net/projects/bowtie-bio/files/bowtie/${BOWTIE_VERSION}/bowtie-${BOWTIE_VERSION}-linux-x86_64.zip -O /tmp/bowtie-${BOWTIE_VERSION}-linux-x86_64.zip
+
+RUN cd /tmp \
+&& unzip /tmp/bowtie-${BOWTIE_VERSION}-linux-x86_64.zip \
+&& mv /tmp/bowtie-${BOWTIE_VERSION}-linux-x86_64 /opt/software
+
+ENV PATH $PATH:/opt/software/bowtie-${BOWTIE_VERSION}-linux-x86_64
+
+# 安装bowtie2
+ENV BOWTIE2_VERSION=2.3.5.1
+
+RUN wget -c https://sourceforge.net/projects/bowtie-bio/files/bowtie2/${BOWTIE2_VERSION}/bowtie2-${BOWTIE2_VERSION}-linux-x86_64.zip -O /tmp/bowtie2-${BOWTIE2_VERSION}-linux-x86_64.zip
+
+RUN cd /tmp \
+&& unzip /tmp/bowtie2-${BOWTIE2_VERSION}-linux-x86_64.zip \
+&& mv /tmp/bowtie2-${BOWTIE2_VERSION}-linux-x86_64 /opt/software
+
+ENV PATH $PATH:/opt/software/bowtie2-${BOWTIE2_VERSION}-linux-x86_64
+
+# 安装hisat2
+ENV HISAT2_VERSION=0.22.3
+
+RUN wget -c ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip -O /tmp/hisat2-2.1.0-Linux_x86_64.zip
+
+RUN cd /tmp \
+&& unzip /tmp/hisat2-2.1.0-Linux_x86_64.zip \
+&& mv /tmp/hisat2-2.1.0-Linux_x86_64 /opt/software
+
+ENV PATH $PATH:/opt/software/hisat2-2.1.0-Linux_x86_64
+
+# 安装Bismark
+ENV BISMARK_VERSION=0.22.3
+
+RUN wget -c https://github.com/FelixKrueger/Bismark/archive/${BISMARK_VERSION}.tar.gz -O /tmp/${BISMARK_VERSION}.tar.gz
+
+RUN cd /tmp \
+&& tar -zxvf /tmp/${BISMARK_VERSION}.tar.gz \
+&& mv /tmp/Bismark-${BISMARK_VERSION} /opt/software/
+
+ENV PATH $PATH:/opt/software/Bismark-${BISMARK_VERSION}
+
+
+# 安装FastQ Screen
+ENV FASTQ_SCREEN_VERSION=0.14.0
+
+RUN wget -c http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.14.0.tar.gz -O /tmp/v${FASTQ_SCREEN_VERSION}.tar.gz
+
+RUN cd /tmp \
+&& tar -zxvf /tmp/v${FASTQ_SCREEN_VERSION}.tar.gz \
+&& mv fastq_screen_v${FASTQ_SCREEN_VERSION} /opt/software/fastq_screen_v${FASTQ_SCREEN_VERSION} \
+&& chmod 755 /opt/software/fastq_screen_v${FASTQ_SCREEN_VERSION}/fastq_screen
+
+
+ENV PATH $PATH:/opt/software/fastq_screen_v${FASTQ_SCREEN_VERSION}

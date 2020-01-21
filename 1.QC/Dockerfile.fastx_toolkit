@@ -1,0 +1,47 @@
+FROM ubuntu:18.04
+
+MAINTAINER Yaheng Wang(jjbioinfo@163.com)
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# 国内跟换阿里镜像源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.aliyun.com\/ubuntu\//g' /etc/apt/sources.list \
+&& apt-get update
+
+RUN apt-get install -y tar \
+		curl \
+		cpanminus \
+		pkg-config \
+		g++ \
+		libtool \
+		automake \
+		autoconf \
+		gcc \
+		make \
+		zlib1g \
+		zlib1g-dev \
+		libgd-dev \
+		gnuplot
+
+
+# 安装fastx_toolkit perl依赖包
+RUN cpan 'ExtUtils::PkgConfig' \
+&& cpan 'PerlIO::gzip' \
+&& cpan 'GD::Graph::bars'
+
+# 安装fastx_toolkit
+ENV FASTX_TOOLKIT_VERSION=0.0.4
+
+RUN curl -L https://github.com/agordon/fastx_toolkit/archive/${FASTX_TOOLKIT_VERSION}.tar.gz -o /tmp/${FASTX_TOOLKIT_VERSION}.tar.gz
+
+RUN cd /tmp \
+&& tar -zxvf ${FASTX_TOOLKIT_VERSION}.tar.gz \
+&& cd fastx_toolkit-${FASTX_TOOLKIT_VERSION} \
+&& ./reconf \
+&& ./configure --prefix=/opt/software/fastx_toolkit-${FASTX_TOOLKIT_VERSION} \
+&& make \
+&& make install 
+
+ENV PATH $PATH:/opt/software/fastx_toolkit-${FASTX_TOOLKIT_VERSION}/bin
+
+WORKDIR /opt/software
