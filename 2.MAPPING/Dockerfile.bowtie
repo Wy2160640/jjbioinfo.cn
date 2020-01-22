@@ -1,0 +1,25 @@
+FROM ubuntu:18.04
+
+MAINTAINER Yaheng Wang(jjbioinfo@163.com)
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# 国内跟换阿里镜像源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.aliyun.com\/ubuntu\//g' /etc/apt/sources.list \
+&& apt-get update
+
+RUN apt-get install -y wget \
+			python3
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# 安装bowtie
+ENV BOWTIE_VERSION=1.2.3
+
+RUN wget -c https://sourceforge.net/projects/bowtie-bio/files/bowtie/${BOWTIE_VERSION}/bowtie-${BOWTIE_VERSION}-linux-x86_64.zip -O /tmp/bowtie-${BOWTIE_VERSION}-linux-x86_64.zip
+
+RUN cd /tmp \
+&& unzip /tmp/bowtie-${BOWTIE_VERSION}-linux-x86_64.zip \
+&& mv /tmp/bowtie-${BOWTIE_VERSION}-linux-x86_64 /opt/software
+
+ENV PATH $PATH:/opt/software/bowtie-${BOWTIE_VERSION}-linux-x86_64

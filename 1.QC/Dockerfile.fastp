@@ -1,0 +1,29 @@
+FROM ubuntu:18.04
+
+MAINTAINER Yaheng Wang(jjbioinfo@163.com)
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# 国内跟换阿里镜像源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.aliyun.com\/ubuntu\//g' /etc/apt/sources.list \
+&& apt-get update
+
+RUN apt-get install -y tar \
+		curl \
+		zlib1g-dev \
+		g++ \
+		make
+
+
+# 安装fastp
+ENV FASTP_VERSION=0.20.0
+
+RUN curl -L https://github.com/OpenGene/fastp/archive/v${FASTP_VERSION}.tar.gz -o /tmp/v${FASTP_VERSION}.tar.gz
+
+WORKDIR /opt/software
+
+RUN tar zxvf /tmp/v${FASTP_VERSION}.tar.gz \
+&& cd fastp-${FASTP_VERSION} \
+&& make \
+&& make install
+
