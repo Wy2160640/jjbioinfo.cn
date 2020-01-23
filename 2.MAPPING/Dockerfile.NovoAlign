@@ -1,0 +1,32 @@
+FROM ubuntu:18.04
+
+MAINTAINER Yaheng Wang(jjbioinfo@163.com)
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# 国内跟换阿里镜像源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.aliyun.com\/ubuntu\//g' /etc/apt/sources.list \
+&& apt-get update
+
+RUN apt-get install -y curl \
+			tar \
+			perl-doc \
+			r-cran-ggplot2 \
+			r-cran-getopt \
+			r-cran-plyr \
+			r-cran-reshape \
+			r-cran-gridextra	
+
+
+# 安装NovoAlign
+ENV NOVOALIGN_VERSION=4.02.00
+ENV LINUX_VERSION=3.10.0
+
+
+WORKDIR /opt/software
+
+ADD src/ /tmp 
+
+RUN tar -zxvf /tmp/novocraftV${NOVOALIGN_VERSION}.Linux${LINUX_VERSION}.tar.gz
+
+ENV PATH $PATH:/opt/software/novocraft

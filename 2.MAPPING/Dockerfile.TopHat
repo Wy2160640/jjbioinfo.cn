@@ -1,0 +1,26 @@
+FROM ubuntu:18.04
+
+MAINTAINER Yaheng Wang(jjbioinfo@163.com)
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# 国内跟换阿里镜像源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.aliyun.com\/ubuntu\//g' /etc/apt/sources.list \
+&& apt-get update
+
+RUN apt-get install -y curl \
+			tar \
+			python
+
+
+
+# 安装TopHat
+ENV TOPHAT_VERSION=2.1.1
+
+WORKDIR /opt/software/
+
+RUN curl -L http://ccb.jhu.edu/software/tophat/downloads/tophat-${TOPHAT_VERSION}.Linux_x86_64.tar.gz -o /tmp/tophat-${TOPHAT_VERSION}.Linux_x86_64.tar.gz
+
+RUN tar -zxvf /tmp/tophat-${TOPHAT_VERSION}.Linux_x86_64.tar.gz
+
+ENV PATH $PATH:/opt/software/tophat-${TOPHAT_VERSION}.Linux_x86_64
