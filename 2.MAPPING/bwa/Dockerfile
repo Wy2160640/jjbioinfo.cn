@@ -14,12 +14,14 @@ RUN apk update && \
 		make \
 		musl-dev \
 		zlib-dev && \
-  wget -c -qO- "https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2" | tar -jx && \
+	wget -c -qO- "https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2" | tar -jx && \
 	cd bwa-0.7.17 && \
 	sed -i 's/const uint8_t rle_auxtab\[8\];/\/\/const uint8_t rle_auxtab\[8\];/g' rle.h && \
 	make && \
 	mv bwa /usr/local/bin/bwa && \
-  rm -rf /var/cache/apk/* && \
+        # delete build package
+	apk del gcc make musl-dev zlib-dev bash && \
+	rm -rf /var/cache/apk/* && \
 	rm -rf bwa-0.7.17
 
 ENTRYPOINT ["bwa"]
